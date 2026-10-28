@@ -164,6 +164,13 @@ h2 .ico svg{width:18px;height:18px}
 @keyframes stick{from{transform:rotate(var(--r,0deg)) scale(.3);opacity:0}to{transform:rotate(var(--r,0deg)) scale(1);opacity:1}}
 .head{position:relative}
 .meals,.pizzas,section,.foot{position:relative}
+
+.check{user-select:none;-webkit-tap-highlight-color:transparent}
+.qbtn{font:inherit;font-size:.8rem;color:var(--muted);background:none;border:0;padding:2px 6px;margin:-2px -6px;border-radius:6px;cursor:pointer;text-decoration:underline dotted;text-decoration-color:color-mix(in srgb,var(--muted) 50%,transparent);text-underline-offset:3px}
+.qbtn:hover{background:color-mix(in srgb,var(--c) 12%,transparent)}
+.qbtn.empty{color:color-mix(in srgb,var(--muted) 70%,transparent);font-style:italic}
+.qin{font:inherit;font-size:.85rem;width:9em;max-width:100%;padding:4px 8px;border:1.5px solid var(--c);border-radius:8px;background:var(--card);color:var(--fg)}
+.list li.done .qbtn{pointer-events:none;text-decoration:none}
 </style>
 </head>
 <body>
@@ -202,7 +209,7 @@ h2 .ico svg{width:18px;height:18px}
     <ol>
       <li><b>Toca un producte</b> quan el tinguis comprat. Tothom ho veu al moment.</li>
       <li><b>Al súper</b> ordena la llista per passadissos; <b>Per àpat</b> diu per a què és cada cosa.</li>
-      <li><b>Afegeix</b> el que falti a sota de cada àpat, o <b>treu-ho</b> amb la ×.</li>
+      <li><b>Toca la quantitat</b> per canviar-la, <b>afegeix</b> el que falti a sota de cada àpat, o <b>treu-ho</b> amb la ×.</li>
     </ol>
   </div>
 
@@ -328,7 +335,7 @@ const LOOK = [
 /* Productes visibles d'una secció: els de base que no s'han tret + els afegits */
 function itemsOf(si){
   const s = SECTIONS[si];
-  const base = s.items.filter(i=>!state.removed[i[0]]).map(([id,n,q])=>({id,n,q}));
+  const base = s.items.filter(i=>!state.removed[i[0]]).map(([id,n,q])=>({id,n,q: (state.qty && typeof state.qty[id]==="string") ? state.qty[id] : q}));
   const extra = Object.entries(state.items||{})
     .filter(([,v])=>v && v.n && sectionOf(v)===s.k
       && !s.items.some(([,bn])=>bn.toLowerCase()===String(v.n).toLowerCase().trim()))
@@ -390,19 +397,32 @@ function makeRow(it, color, chip, group){
   li.dataset.id = it.id;
   if (on) li.className = "done";
   if (color) li.style.setProperty("--c", color);
-  const chk = document.createElement("button");
-  chk.type = "button"; chk.className = "check";
-  chk.setAttribute("aria-pressed", on ? "true":"false");
-  chk.innerHTML = `<span class="box">${tick}</span><span class="txt"><span class="name"></span><span class="meta"><span class="qty"></span></span></span>`;
+  /* La fila es marca tocant-la; la quantitat té el seu propi botó per editar-la */
+  const chk = document.createElement("div");
+  chk.className = "check"; chk.tabIndex = 0; chk.setRole = null;
+  chk.setAttribute("role","button"); chk.setAttribute("aria-pressed", on ? "true":"false");
+  chk.innerHTML = `<span class="box">${tick}</span><span class="txt"><span class="name"></span><span class="meta"></span></span>`;
   chk.querySelector(".name").textContent = it.n;
-  chk.querySelector(".qty").textContent = it.q;
-  if (!it.q && !chip) chk.querySelector(".meta").remove();
+  const meta = chk.querySelector(".meta");
+  if (group){
+    if (it.q){ const q = document.createElement("span"); q.className = "qty"; q.textContent = it.q; meta.appendChild(q); }
+  } else {
+    const q = document.createElement("button"); q.type = "button"; q.className = "qty qbtn" + (it.q ? "" : " empty");
+    q.textContent = it.q || "+ quantitat";
+    q.setAttribute("aria-label", "Canvia la quantitat de " + it.n);
+    q.addEventListener("click", e=>{ e.stopPropagation(); editQty(it, q); });
+    q.addEventListener("keydown", e=>e.stopPropagation());
+    meta.appendChild(q);
+  }
   for (const [txt,col] of [].concat(chip ? (Array.isArray(chip) ? chip : [[chip,color]]) : [])){
     const c = document.createElement("span"); c.className = "mchip"; c.textContent = txt;
     if (col) c.style.setProperty("--c", col);
-    chk.querySelector(".meta").appendChild(c);
+    meta.appendChild(c);
   }
-  chk.addEventListener("click", ()=> group ? toggleMany(ids, !on) : toggle(it.id));
+  if (!meta.children.length) meta.remove();
+  const act = ()=> group ? toggleMany(ids, !on) : toggle(it.id);
+  chk.addEventListener("click", act);
+  chk.addEventListener("keydown", e=>{ if (e.key==="Enter" || e.key===" "){ e.preventDefault(); act(); } });
   const del = document.createElement("button");
   del.type = "button"; del.className = "del"; del.textContent = "×";
   del.setAttribute("aria-label", "Treu " + it.n);
@@ -414,9 +434,34 @@ function makeRow(it, color, chip, group){
   li.append(chk, del);
   return li;
 }
+
+/* Edita la quantitat al mateix lloc */
+let editing = false, pendingRender = false;
+function editQty(it, btn){
+  const inp = document.createElement("input");
+  inp.className = "qin"; inp.value = it.q; inp.maxLength = 20; inp.placeholder = "Quantitat";
+  inp.setAttribute("aria-label", "Quantitat de " + it.n);
+  btn.replaceWith(inp); editing = true; inp.focus(); inp.select();
+  let done = false;
+  const finish = save => {
+    if (done) return; done = true; editing = false;
+    const v = inp.value.trim();
+    if (save && v !== it.q){
+      if (it.custom){ state.items[it.id] = {...state.items[it.id], q:v}; put("items/"+it.id+"/q", v); }
+      else { state.qty = state.qty || {}; state.qty[it.id] = v; put("qty/"+it.id, v); }
+      saveLocal(); status("Quantitat desada.");
+    }
+    pendingRender = false; render();
+  };
+  inp.addEventListener("click", e=>e.stopPropagation());
+  inp.addEventListener("keydown", e=>{ e.stopPropagation(); if (e.key==="Enter"){ e.preventDefault(); finish(true); } if (e.key==="Escape") finish(false); });
+  inp.addEventListener("blur", ()=>finish(true));
+}
+
 function emptyRow(text){ const li = document.createElement("li"); li.className = "empty"; li.textContent = text; return li; }
 
 function render(){
+  if (editing){ pendingRender = true; return; }
   let total = 0, n = 0;
   const shopRows = {}; AISLES.forEach(([k])=>shopRows[k]=[]); shopRows.altres = [];
   SECTIONS.forEach((s,si)=>{
@@ -517,7 +562,7 @@ function loadLocal(){
 }
 function norm(d){
   d = d && typeof d === "object" ? d : {};
-  return {checks:d.checks||{}, items:d.items||{}, removed:d.removed||{}, meals:d.meals||{}, mealsRemoved:d.mealsRemoved||{}};
+  return {checks:d.checks||{}, items:d.items||{}, removed:d.removed||{}, meals:d.meals||{}, mealsRemoved:d.mealsRemoved||{}, qty:d.qty||{}};
 }
 
 async function req(path, opts){
