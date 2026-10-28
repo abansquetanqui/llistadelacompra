@@ -4,113 +4,240 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Llista de la compra</title>
+<meta name="theme-color" content="#e5432f">
+<meta name="color-scheme" content="light only">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Compra">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23e5432f'/%3E%3Cpath d='M18 33l9 9 19-20' fill='none' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
+/* Festive market: checked-tablecloth band, one colour per section, big bold type */
 :root{
-  --bg:#f3f6f1; --card:#ffffff; --fg:#1d2a22; --muted:#66756b; --line:#dbe3dc;
-  --accent:#3f7a3a; --accent-soft:#e3efe0; --done:#9aa79e; --wa:#1f8f4e; --warn:#b3412e;
+  --bg:#f6f7fb; --card:#ffffff; --fg:#1b1d2a; --muted:#6a6f85; --line:#e3e5ee;
+  --tomato:#e5432f; --basil:#2f8f4e; --sun:#f2a516; --plum:#7b3b8c; --sky:#2b7fc4; --slate:#5b6478; --wa:#1f8f4e;
+  --done:#a3a7b8; --warn:#d2462f;
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible",system-ui,sans-serif;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root{
-  --bg:#141a16; --card:#1c241f; --fg:#e6ede7; --muted:#9aa89e; --line:#2c3830;
-  --accent:#8cc985; --accent-soft:#25362a; --done:#5d6b62; --wa:#5fd08f; --warn:#f08a74; color-scheme:dark}}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4}
-.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(20px + env(safe-area-inset-top,0px)) calc(48px + env(safe-area-inset-bottom,0px))}
-h1{font-family:var(--display);font-weight:800;font-size:2rem;letter-spacing:-.02em;margin:0;text-wrap:balance}
-.sub{color:var(--muted);margin:4px 0 0}
-.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding-block:12px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.cloth{height:calc(22px + env(safe-area-inset-top,0px));background:
+  repeating-linear-gradient(90deg,color-mix(in srgb,var(--tomato) 55%,transparent) 0 22px,transparent 22px 44px),
+  repeating-linear-gradient(0deg,color-mix(in srgb,var(--tomato) 55%,transparent) 0 11px,transparent 11px 22px),var(--card)}
+.wrap{max-width:580px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px calc(56px + env(safe-area-inset-bottom,0px))}
+.kicker{font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tomato);margin:0}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.3rem,10vw,3.4rem);line-height:.95;letter-spacing:-.035em;margin:6px 0 0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--tomato)}
+.sub{color:var(--muted);margin:10px 0 0;max-width:46ch}
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding-block:12px;margin-top:14px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line)}
 .prog{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
-.prog b{font-family:var(--display);font-size:1.15rem}
-.track{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
-.fill{height:100%;width:0;background:var(--accent);transition:width .25s}
+.prog b{font-family:var(--display);font-weight:800;font-size:1.4rem;letter-spacing:-.02em}
+.prog span{color:var(--muted);font-size:.9rem}
+.track{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sun),var(--tomato) 45%,var(--plum));background-size:580px 100%;transition:width .4s cubic-bezier(.3,1.4,.5,1)}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
-.act{font:inherit;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none;display:inline-block}
-.act.primary{background:var(--wa);color:var(--bg);border-color:var(--wa)}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.status{font-size:.85rem;color:var(--muted);min-height:1.2em}
-section{margin-top:24px}
-h2{font-family:var(--display);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between}
-h2 span{font-variant-numeric:tabular-nums}
-.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:14px 14px 0 0;overflow:hidden}
+.act{font:inherit;font-weight:700;font-size:.9rem;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:99px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.act.primary{background:var(--wa);color:#fff;border-color:var(--wa)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--tomato);outline-offset:2px}
+.status{font-size:.82rem;color:var(--muted);min-height:1.2em;display:flex;align-items:center;gap:6px}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--done);flex:none}
+.status.live::before{background:var(--basil);box-shadow:0 0 0 3px color-mix(in srgb,var(--basil) 25%,transparent)}
+section{margin-top:28px;--c:var(--basil)}
+h2{margin:0 0 10px;display:flex;align-items:center;gap:10px}
+h2 .tag{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+h2 .tag small{display:block;font-family:var(--body);font-weight:400;font-size:.85rem;letter-spacing:0;color:var(--muted)}
+h2 .tag{min-width:0}
+h2 .ico{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--c);color:var(--card)}
+h2 .ico svg{width:20px;height:20px}
+h2 .cnt{margin-left:auto;font-family:var(--display);font-weight:600;font-size:.85rem;font-variant-numeric:tabular-nums;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);padding:3px 10px;border-radius:99px}
+h2 .cnt.full{background:var(--c);color:var(--card)}
+.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:18px 18px 0 0;overflow:hidden}
 .list li{display:flex;align-items:center}
 .list li+li{border-top:1px solid var(--line)}
-.check{all:unset;box-sizing:border-box;flex:1;min-width:0;display:flex;gap:12px;align-items:center;padding:12px 4px 12px 14px;cursor:pointer;min-height:48px}
-.check:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-.box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;transition:background .15s,border-color .15s}
-.box svg{width:14px;height:14px;opacity:0;color:var(--bg)}
-.name{flex:1;min-width:0;overflow-wrap:anywhere}
-.qty{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums;text-align:right}
-.list li.done .box{background:var(--accent);border-color:var(--accent)}
-.list li.done .box svg{opacity:1}
-.list li.done .name{color:var(--done);text-decoration:line-through}
-.del{flex:none;font:inherit;border:0;background:none;color:var(--muted);cursor:pointer;min-width:44px;min-height:44px;padding:0 10px;font-size:1.1rem;line-height:1;border-radius:8px}
-.del.armed{color:var(--bg);background:var(--warn);font-size:.8rem;font-weight:700;margin-right:6px;min-height:32px}
-.add{display:flex;gap:6px;padding:8px;background:var(--card);border:1px solid var(--line);border-top:1px dashed var(--line);border-radius:0 0 14px 14px}
-.add input{font:inherit;font-size:.95rem;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);color:var(--fg)}
+.check{all:unset;box-sizing:border-box;flex:1;min-width:0;display:flex;gap:12px;align-items:center;padding:12px 4px 12px 14px;cursor:pointer;min-height:50px}
+.check:focus-visible{outline:2px solid var(--c);outline-offset:-2px}
+.box{flex:none;width:24px;height:24px;border-radius:8px;border:2px solid color-mix(in srgb,var(--c) 45%,var(--line));display:grid;place-items:center;transition:background .15s,border-color .15s,transform .15s}
+.box svg{width:15px;height:15px;color:var(--card);stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .25s ease .05s}
+.name{flex:1;min-width:0;overflow-wrap:anywhere;transition:color .2s}
+.qty{color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.list li.done .box{background:var(--c);border-color:var(--c)}
+.list li.done .box svg{stroke-dashoffset:0}
+.list li.done .name{color:var(--done);text-decoration:line-through;text-decoration-color:var(--c);text-decoration-thickness:2px}
+.list li.pop .box{animation:pop .35s}
+@keyframes pop{40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.del{flex:none;font:inherit;border:0;background:none;color:var(--done);cursor:pointer;min-width:44px;min-height:44px;padding:0 10px;font-size:1.15rem;line-height:1;border-radius:99px}
+.del.armed{color:#fff;background:var(--warn);font-size:.78rem;font-weight:700;margin-right:6px;min-height:30px;padding:0 12px}
+.add{display:flex;gap:6px;padding:8px;background:color-mix(in srgb,var(--c) 7%,var(--card));border:1px solid var(--line);border-top:1.5px dashed color-mix(in srgb,var(--c) 40%,var(--line));border-radius:0 0 18px 18px}
+.add input{font:inherit;font-size:.95rem;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--card);color:var(--fg)}
 .add .n{flex:2}
 .add .q{flex:1}
-.add button{font:inherit;font-weight:700;font-size:.9rem;border:0;border-radius:8px;padding:0 12px;background:var(--accent);color:var(--bg);cursor:pointer}
-.empty{padding:12px 14px;color:var(--muted);font-size:.9rem}
-details{margin-top:28px;background:var(--accent-soft);border-radius:14px;padding:12px 14px}
-summary{font-family:var(--display);font-weight:600;cursor:pointer}
-.pz{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
-.pz li{font-size:.95rem}
-.pz b{display:block}
-.reset{margin-top:24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.add button{font:inherit;font-weight:800;font-size:1.2rem;border:0;border-radius:10px;width:44px;flex:none;background:var(--c);color:var(--card);cursor:pointer}
+.empty{padding:14px;color:var(--muted);font-size:.9rem}
+.pizzas{margin-top:36px}
+.pizzas h3{font-family:var(--display);font-weight:800;font-size:1.25rem;margin:0 0 10px}
+.pz{list-style:none;margin:0;padding:0 0 6px;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory}
+.pz li{flex:0 0 78%;max-width:300px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;font-size:.92rem;color:var(--muted);position:relative;overflow:hidden}
+.pz li::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:var(--pc)}
+.pz .num{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;color:var(--pc)}
+.pz b{display:block;font-family:var(--display);font-size:1.1rem;color:var(--fg);margin:4px 0 6px}
+.meals{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 14px}
+.meals h3{font-family:var(--display);font-weight:800;font-size:1.25rem;margin:10px 0 4px}
+.meal{display:grid;grid-template-columns:5.6rem 1fr;align-items:center;gap:10px;padding:10px 0;align-items:baseline}
+.meal+.meal{border-top:1px solid var(--line)}
+.day{font-family:var(--display);font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mc);line-height:1.25}
+.day small{display:block;color:var(--muted);font-weight:600}
+.what{min-width:0;display:flex;align-items:center;gap:4px}
+.what textarea{flex:1;min-width:0;font:inherit;resize:none;overflow:hidden;line-height:1.35;display:block;border:0;background:none;color:var(--fg);padding:4px 6px;margin:-4px -6px;border-radius:8px}
+.what textarea:hover{background:color-mix(in srgb,var(--line) 50%,transparent)}
+.what textarea:focus{background:var(--bg);outline:2px solid var(--mc)}
+.what textarea::placeholder{color:var(--muted);font-style:italic}
+.meal .del{min-width:36px;min-height:36px;margin-right:-8px}
+.madd{display:flex;gap:6px;padding:10px 0 12px;border-top:1.5px dashed var(--line)}
+.madd input{font:inherit;font-size:.92rem;min-width:0;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);color:var(--fg)}
+.madd #md{flex:1}.madd #mw{flex:2}
+.madd button{font:inherit;font-weight:800;font-size:1.2rem;border:0;border-radius:10px;width:44px;flex:none;background:var(--tomato);color:var(--card);cursor:pointer}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line);border-radius:99px;padding:3px;gap:3px}
+.seg button{font:inherit;font-weight:700;font-size:.9rem;border:0;border-radius:99px;padding:8px 10px;background:none;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgb(0 0 0 / .12)}
+.row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chipbtn{font:inherit;font-size:.85rem;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--muted);border-radius:99px;padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chipbtn[aria-pressed="true"]{border-color:var(--fg);color:var(--fg)}
+.chipbtn .dot{width:10px;height:10px;border-radius:3px;border:2px solid currentColor}
+.chipbtn[aria-pressed="true"] .dot{background:currentColor}
+.tip{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:8px}
+.tip h3{font-family:var(--display);font-weight:800;font-size:1.05rem;margin:0;display:flex;justify-content:space-between;align-items:center}
+.tip ol{margin:0;padding-left:1.2em;color:var(--muted);display:grid;gap:4px;font-size:.93rem}
+.tip ol b{color:var(--fg)}
+.tip .x{font:inherit;border:0;background:none;color:var(--muted);font-size:1.2rem;cursor:pointer;min-width:36px;min-height:36px;border-radius:99px}
+.note{margin:0 0 8px;color:var(--muted);font-size:.88rem}
+.mchip{flex:none;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);border-radius:99px;padding:2px 8px;white-space:nowrap}
+.aisle{margin-top:24px}
+.aisle h2 .ico{background:var(--fg)}
+.foot{margin-top:28px;color:var(--muted);font-size:.82rem;text-align:center}
+.reset{margin-top:28px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:20;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Mòbil més net */
+h1{font-size:clamp(2rem,9vw,3.2rem)}
+.row2.top{margin-top:14px;justify-content:space-between;flex-wrap:nowrap}
+.row2.top .status{flex:1;min-width:0}
+.row2.top .act{padding:7px 14px;font-size:.85rem;flex:none}
+.bar{gap:8px;padding-block:10px;margin-top:10px}
+.prog b{font-size:1.1rem}
+.track{height:8px}
+.ctl{display:flex;gap:8px;align-items:center}
+.ctl .seg{flex:1}
+.eye{flex:none;width:42px;height:38px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.eye svg{width:20px;height:20px}
+.eye .off{display:none}
+.eye[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.eye[aria-pressed="true"] .on{display:none}
+.eye[aria-pressed="true"] .off{display:block}
+.check{padding:10px 4px 10px 14px;min-height:48px}
+.txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.meta{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.meta .qty{text-align:left;font-size:.8rem}
+.mchip{font-size:.62rem;padding:1px 7px}
+.list{border-radius:18px}
+.addbtn{display:block;width:100%;margin-top:6px;font:inherit;font-size:.88rem;font-weight:700;color:var(--c);background:none;border:1.5px dashed color-mix(in srgb,var(--c) 40%,var(--line));border-radius:14px;padding:10px;cursor:pointer;text-align:left}
+.add{margin-top:6px;border-radius:14px;border-top:1px solid var(--line)}
+section{margin-top:22px}
+h2 .tag{font-size:1.1rem}
+h2 .ico{width:30px;height:30px;border-radius:10px}
+h2 .ico svg{width:18px;height:18px}
+.meals{padding:4px 14px}
+.meal{padding:8px 0;grid-template-columns:4.9rem 1fr}
+.what textarea{font-size:.95rem}
+.tip{padding:12px 14px}
+.tip ol{font-size:.88rem}
 </style>
 </head>
 <body>
+<div class="cloth" aria-hidden="true"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
 <div class="wrap">
-  <h1>Llista de la compra</h1>
-  <p class="sub">Toca un producte per marcar-lo. Pots afegir-ne o treure'n. Tothom qui tingui l'enllaç veu el mateix al moment.</p>
+  <p class="kicker">Compra compartida</p>
+  <h1>Llista de la <em>compra</em></h1>
+  <div class="row2 top">
+    <div class="status" id="status" aria-live="polite"></div>
+    <a class="act primary" id="wa" href="#" target="_blank" rel="noopener" aria-label="Envia l'enllaç per WhatsApp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>WhatsApp</a>
+  </div>
 
   <div class="bar">
-    <div class="prog"><b id="count">0 / 0</b><span id="pct" class="sub" style="margin:0">0%</span></div>
+    <div class="prog"><b id="count">0 / 0</b><span id="pct">0%</span></div>
     <div class="track"><div class="fill" id="fill"></div></div>
-    <div class="actions">
-      <a class="act primary" id="wa" href="#" target="_blank" rel="noopener">Envia per WhatsApp</a>
-      <button class="act" id="copylink" type="button">Copia l'enllaç</button>
-      <button class="act" id="pending" type="button">Copia el que falta</button>
+    <div class="ctl">
+      <div class="seg" role="group" aria-label="Com vols veure la llista">
+        <button type="button" id="vMeal" aria-pressed="true">Per àpat</button>
+        <button type="button" id="vShop" aria-pressed="false">Al súper</button>
+      </div>
+      <button type="button" class="eye" id="hide" aria-pressed="false" aria-label="Amaga els comprats" title="Amaga els comprats">
+        <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/></svg>
+      </button>
     </div>
-    <div class="status" id="status" aria-live="polite"></div>
+  </div>
+
+  <div class="tip" id="tip" hidden>
+    <h3>Com funciona <button type="button" class="x" id="tipx" aria-label="Amaga l'explicació">×</button></h3>
+    <ol>
+      <li><b>Toca un producte</b> quan el tinguis comprat. Tothom ho veu al moment.</li>
+      <li><b>Al súper</b> ordena la llista per passadissos; <b>Per àpat</b> diu per a què és cada cosa.</li>
+      <li><b>Afegeix</b> el que falti a sota de cada àpat, o <b>treu-ho</b> amb la ×.</li>
+    </ol>
+  </div>
+
+  <div class="meals">
+    <h3>Àpats</h3>
+    <div id="mealrows"></div>
+    <form class="madd" id="madd">
+      <input id="md" placeholder="Dia i hora" aria-label="Dia i hora" maxlength="30" autocomplete="off">
+      <input id="mw" placeholder="Què menjarem" aria-label="Què menjarem" maxlength="120" autocomplete="off">
+      <button type="submit" aria-label="Afegeix àpat">+</button>
+    </form>
   </div>
 
   <div id="lists"></div>
+  <div id="shop" hidden></div>
 
-  <details>
-    <summary>Les 5 pizzes</summary>
+  <div class="pizzas" id="pizzes">
+    <h3>Les 5 pizzes</h3>
     <ul class="pz">
-      <li><b>1. Hortolana</b>Tomàquet, mozzarella vegana, ceba, pebrot, xampinyons, olives negres, orenga</li>
-      <li><b>2. Mallorquina</b>Tomàquet, mozzarella vegana, sobrassada vegana, agave en sortir del forn</li>
-      <li><b>3. Bianca de carxofa</b>Crema de soja blanca, all, julivert fresc, carxofes, formatge ratllat vegà, burger Heura, olives negres, xampinyons</li>
-      <li><b>4. BBQ</b>Tomàquet, mozzarella vegana, carn picada vegana, parmesà vegà, salsa BBQ vegana, ceba, orenga</li>
-      <li><b>5. Tòfona</b>Tomàquet, mozzarella vegana, butifarra Heura (o pernil dolç vegà), xampinyons, tòfona triturada en oli d'oliva i rúcula en sortir del forn</li>
+      <li style="--pc:var(--basil)"><span class="num">1</span><b>Hortolana</b>Tomàquet, mozzarella vegana, ceba, pebrot, xampinyons, olives negres, orenga</li>
+      <li style="--pc:var(--plum)"><span class="num">2</span><b>Mallorquina</b>Tomàquet, mozzarella vegana, sobrassada vegana i agave en sortir del forn</li>
+      <li style="--pc:var(--sun)"><span class="num">3</span><b>Bianca de carxofa</b>Crema de soja blanca, all, julivert fresc, carxofes, formatge ratllat vegà, burger Heura, olives negres, xampinyons</li>
+      <li style="--pc:var(--tomato)"><span class="num">4</span><b>BBQ</b>Tomàquet, mozzarella vegana, carn picada vegana, parmesà vegà, salsa BBQ vegana, ceba, orenga</li>
+      <li style="--pc:var(--fg)"><span class="num">5</span><b>Tòfona</b>Tomàquet, mozzarella vegana, butifarra Heura (o pernil dolç vegà), xampinyons, tòfona triturada en oli d'oliva i rúcula en sortir del forn</li>
     </ul>
-  </details>
+  </div>
 
   <div class="reset">
     <button class="act" id="reset" type="button">Desmarca-ho tot</button>
     <button class="act" id="resetok" type="button" hidden>Sí, desmarca-ho</button>
     <button class="act" id="restore" type="button">Recupera els productes trets</button>
+    <button class="act" id="pending" type="button">Copia el que falta</button>
+    <button class="act" id="copylink" type="button">Copia l'enllaç</button>
   </div>
+  <p class="foot">Els canvis es guarden sols i es comparteixen amb tothom qui tingui l'enllaç.</p>
 </div>
 
 <script>
 /* Llista inicial: [id curt, nom, quantitat]. El que la gent afegeixi o tregui es guarda a Firebase. */
 const SECTIONS = [
-  {t:"Esmorzars", items:[
+  {k:"esm", t:"Esmorzars", items:[
     ["pa","Pa de poble","1"],["formatges","Formatges",""],["embotit","Embotit del poble",""],
-    ["figa","Melmelada de figa","1 pot"],["civada","Llet de civada","1 brik"],["cafe","Cafè","1 paquet"]]},
-  {t:"Plats", items:[
-    ["caldo","Caldo","1 brik"],["pastasopa","Pasta de sopa","1 paquet"],["gyozas","Gyozas","1 paquet"],
-    ["tfregit","Tomàquet fregit","1 pot"],["carbasso","Carbassó","1"],["heuracl","Heura clàssica","1 paquet"]]},
-  {t:"Pizzes", items:[
+    ["figa","Melmelada de figa","1 pot"],["civada","Llet de civada","1 brik"],["cafe","Cafè","1 paquet"],["llet","Llet de vaca","2"]]},
+  {k:"dij", t:"Dijous nit · Sopa i gyozas", items:[
+    ["caldo","Caldo","1 brik"],["pastasopa","Pasta de sopa","1 paquet"],
+    ["carbasso","Carbassó","1"],["gyozas","Gyozas","1 paquet"]]},
+  {k:"div", t:"Divendres nit · Pa amb tomàquet i truites", note:"Les truites es fan a casa: de patata, de moniato i una de vegana amb farina de cigró.", items:[
+    ["ous","Ous","12"],["cigro","Farina de cigró","1"],["moniato","Moniato","3"],["patates","Patata","6"],["cebatr","Ceba","4"]]},
+  {k:"piz", t:"Dissabte nit · Pizzes", items:[
     ["massa","Massa de pizza","5 boles"],["ttriturat","Tomàquet triturat","1 pot"],
     ["mozza","Mozzarella vegana","2 paquets"],["ceba","Ceba","1"],["pebrot","Pebrot","1"],
     ["xampis","Xampinyons","1 safata"],["olives","Olives negres","1 pot"],["orenga","Orenga","1 pot"],
@@ -121,10 +248,44 @@ const SECTIONS = [
     ["parmesa","Parmesà vegà","1 paquet"],["bbq","Salsa BBQ vegana","1 ampolla"],
     ["butifarra","Butifarra Heura (o pernil dolç vegà)","1 paquet"],
     ["tofona","Tòfona triturada en oli d'oliva","1 pot"],["rucula","Rúcula","1 bossa"]]},
-  {t:"Begudes", items:[
+  {k:"beg", t:"Begudes", items:[
     ["vinegre","Vi negre",""],["viblanc","Vi blanc",""],["birra","Birra",""],
-    ["coca","Coca-Cola Zero",""],["clares","Clares",""]]}
+    ["coca","Coca-Cola Zero",""],["clares","Clares",""]]},
+  {k:"pend", t:"Per decidir", note:"Encara no tenen àpat. Si no calen, traieu-los amb la ×.", items:[
+    ["tfregit","Tomàquet fregit","1 pot"],["heuracl","Heura clàssica","1 paquet"]]}
 ];
+/* Vista "Al súper": passadís de cada producte */
+const AISLES = [
+  ["fv","Fruita i verdura",["moniato","patates","cebatr","carbasso","ceba","pebrot","xampis","all","julivert","rucula"]],
+  ["forn","Forn",["pa"]],
+  ["nev","Nevera i fiambres",["ous","formatges","embotit","gyozas","heuracl","massa","mozza","ratllat","parmesa","sobrassada","burgers","picada","butifarra"]],
+  ["reb","Rebost",["llet","cigro","figa","civada","cafe","caldo","pastasopa","tfregit","ttriturat","olives","orenga","agave","cremasoja","carxofes","bbq","tofona"]],
+  ["beg","Begudes",["vinegre","viblanc","birra","coca","clares"]]
+];
+const AISLE_OF = {}; AISLES.forEach(([k,,ids])=>ids.forEach(id=>AISLE_OF[id]=k));
+/* Passadís pel nom, per als productes que afegeix la gent */
+const AISLE_BY_NAME = {"patata":"fv","patates":"fv","moniato":"fv","moniatos":"fv","carbassa":"fv","tomàquet":"fv","tomàquets":"fv","llimona":"fv",
+  "ous":"nev","ou":"nev","llet de vaca":"reb","llet":"reb","farina de cigró":"reb","pa":"forn","pa de motlle":"forn"};
+function aisleOf(it){
+  if (AISLE_OF[it.id]) return AISLE_OF[it.id];
+  const key = it.n.toLowerCase().trim();
+  if (AISLE_BY_NAME[key]) return AISLE_BY_NAME[key];
+  for (const sec of SECTIONS) for (const [id,n] of sec.items) if (n.toLowerCase()===key && AISLE_OF[id]) return AISLE_OF[id];
+  return "altres";
+}
+const SHORT = {esm:"Esmorzar",dij:"Dijous",div:"Divendres",piz:"Pizzes",beg:"Begudes",pend:"Per decidir"};
+let view = "meal", hideDone = false;
+try{ view = localStorage.getItem("lc-view")==="shop" ? "shop" : "meal"; hideDone = localStorage.getItem("lc-hide")==="1"; }catch(e){}
+
+/* Productes afegits amb la versió antiga: secció per número */
+const LEGACY = {0:"esm",1:"dij",2:"piz",3:"beg"};
+/* Ingredients de les truites afegits a "Plats" a la versió antiga: van a Divendres nit */
+const TRUITA = ["ous","farina de cigró","moniato","patata","patates","ceba"];
+function sectionOf(v){
+  if (typeof v.s === "string") return v.s;
+  if (v.s === 1 && TRUITA.includes(String(v.n).toLowerCase().trim())) return "div";
+  return LEGACY[v.s];
+}
 
 /* Firebase Realtime Database: /llista/checks, /llista/items (afegits), /llista/removed (trets) */
 const DB = "https://llista-de-la-compra-b11bf-default-rtdb.europe-west1.firebasedatabase.app/llista";
@@ -133,14 +294,26 @@ let state = {checks:{}, items:{}, removed:{}};
 
 const tick = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
 
+/* Color i icona de cada secció */
+const SV = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const LOOK = [
+  {c:"var(--sky)",    i:SV('<path d="M4 10h13v4a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z"/><path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3c0 1.5 1 1.5 1 3M12 3c0 1.5 1 1.5 1 3"/>')},
+  {c:"var(--basil)",  i:SV('<path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/>')},
+  {c:"var(--sun)",    i:SV('<path d="M5 12a4 4 0 0 1 0-8h14a4 4 0 0 1 0 8v8H5z"/><path d="M9 12v4M12 12v4M15 12v4"/>')},
+  {c:"var(--tomato)", i:SV('<path d="M12 3 3 19c6 2.5 12 2.5 18 0z"/><circle cx="11" cy="12" r="1.3"/><circle cx="14" cy="16" r="1.3"/><circle cx="9" cy="16.5" r="1.3"/>')},
+  {c:"var(--plum)",   i:SV('<path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"/><path d="M12 13v7M8.5 21h7"/>')},
+  {c:"var(--muted)",  i:SV('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>')}
+];
+
 /* Productes visibles d'una secció: els de base que no s'han tret + els afegits */
 function itemsOf(si){
   const s = SECTIONS[si];
   const base = s.items.filter(i=>!state.removed[i[0]]).map(([id,n,q])=>({id,n,q}));
   const extra = Object.entries(state.items||{})
-    .filter(([,v])=>v && v.s===si && v.n)
+    .filter(([,v])=>v && v.n && sectionOf(v)===s.k
+      && !s.items.some(([,bn])=>bn.toLowerCase()===String(v.n).toLowerCase().trim()))
     .sort((a,b)=>(a[1].t||0)-(b[1].t||0))
-    .map(([id,v])=>({id, n:String(v.n), q:String(v.q||""), custom:true}));
+    .map(([id,v])=>{ const n = String(v.n).trim(); return {id, n:n.charAt(0).toUpperCase()+n.slice(1), q:String(v.q||""), custom:true}; });
   return base.concat(extra);
 }
 
@@ -150,13 +323,23 @@ function build(){
   const root = document.getElementById("lists");
   SECTIONS.forEach((s,si)=>{
     const sec = document.createElement("section");
+    sec.style.setProperty("--c", LOOK[si].c);
     const h = document.createElement("h2");
-    const b = document.createElement("b"); b.textContent = s.t;
-    const c = document.createElement("span"); c.id = "c"+si;
+    const b = document.createElement("span"); b.className = "tag";
+    b.innerHTML = `<span class="ico">${LOOK[si].i}</span><span></span>`;
+    const [main, sub] = s.t.split(" · ");
+    b.lastChild.textContent = main;
+    if (sub){ const sm = document.createElement("small"); sm.textContent = sub; b.lastChild.appendChild(sm); }
+    const c = document.createElement("span"); c.id = "c"+si; c.className = "cnt";
     h.append(b,c);
+    sec.appendChild(h);
+    if (s.note){ const p = document.createElement("p"); p.className = "note"; p.textContent = s.note; sec.appendChild(p); }
     const ul = document.createElement("ul"); ul.className = "list";
     const f = document.createElement("form"); f.className = "add";
-    f.innerHTML = `<input class="n" id="n${si}" placeholder="Afegeix a ${s.t.toLowerCase()}…" aria-label="Producte nou" maxlength="60" autocomplete="off">
+    const open = document.createElement("button"); open.type = "button"; open.className = "addbtn"; open.textContent = "+ Afegeix un producte";
+    f.hidden = true;
+    open.addEventListener("click", ()=>{ open.hidden = true; f.hidden = false; f.querySelector(".n").focus(); });
+    f.innerHTML = `<input class="n" id="n${si}" placeholder="Afegeix…" aria-label="Producte nou" maxlength="60" autocomplete="off">
       <input class="q" id="q${si}" placeholder="Quantitat" aria-label="Quantitat" maxlength="20" autocomplete="off">
       <button type="submit">+</button>`;
     f.addEventListener("submit", e=>{
@@ -167,52 +350,134 @@ function build(){
       addItem(si, n, q);
       f.reset(); f.querySelector(".n").focus();
     });
-    sec.append(h, ul, f); root.appendChild(sec);
+    f.addEventListener("focusout", ()=>setTimeout(()=>{ if (!f.contains(document.activeElement) && !f.querySelector(".n").value){ f.hidden = true; open.hidden = false; } },150));
+    sec.append(ul, open, f); root.appendChild(sec);
     lists.push(ul);
   });
 }
 
+function makeRow(it, color, chip, group){
+  const ids = group ? group.map(g=>g.id) : [it.id];
+  const on = ids.every(id=>state.checks[id]);
+  const li = document.createElement("li");
+  li.dataset.id = it.id;
+  if (on) li.className = "done";
+  if (color) li.style.setProperty("--c", color);
+  const chk = document.createElement("button");
+  chk.type = "button"; chk.className = "check";
+  chk.setAttribute("aria-pressed", on ? "true":"false");
+  chk.innerHTML = `<span class="box">${tick}</span><span class="txt"><span class="name"></span><span class="meta"><span class="qty"></span></span></span>`;
+  chk.querySelector(".name").textContent = it.n;
+  chk.querySelector(".qty").textContent = it.q;
+  if (!it.q && !chip) chk.querySelector(".meta").remove();
+  for (const [txt,col] of [].concat(chip ? (Array.isArray(chip) ? chip : [[chip,color]]) : [])){
+    const c = document.createElement("span"); c.className = "mchip"; c.textContent = txt;
+    if (col) c.style.setProperty("--c", col);
+    chk.querySelector(".meta").appendChild(c);
+  }
+  chk.addEventListener("click", ()=> group ? toggleMany(ids, !on) : toggle(it.id));
+  const del = document.createElement("button");
+  del.type = "button"; del.className = "del"; del.textContent = "×";
+  del.setAttribute("aria-label", "Treu " + it.n);
+  del.addEventListener("click", ()=>{
+    if (del.classList.contains("armed")) { (group || [it]).forEach(removeItem); return; }
+    del.classList.add("armed"); del.textContent = "Treu";
+    setTimeout(()=>{ if (del.isConnected){ del.classList.remove("armed"); del.textContent = "×"; } }, 3000);
+  });
+  li.append(chk, del);
+  return li;
+}
+function emptyRow(text){ const li = document.createElement("li"); li.className = "empty"; li.textContent = text; return li; }
+
 function render(){
   let total = 0, n = 0;
+  const shopRows = {}; AISLES.forEach(([k])=>shopRows[k]=[]); shopRows.altres = [];
   SECTIONS.forEach((s,si)=>{
     const ul = lists[si];
     const items = itemsOf(si);
     ul.replaceChildren();
-    if (!items.length){
-      const li = document.createElement("li"); li.className = "empty"; li.textContent = "Res a comprar aquí.";
-      ul.appendChild(li);
-    }
-    let cs = 0;
+    let cs = 0, shown = 0;
     for (const it of items){
       const on = !!state.checks[it.id];
       if (on) cs++;
-      const li = document.createElement("li");
-      if (on) li.className = "done";
-      const chk = document.createElement("button");
-      chk.type = "button"; chk.className = "check";
-      chk.setAttribute("aria-pressed", on ? "true":"false");
-      chk.innerHTML = `<span class="box">${tick}</span><span class="name"></span><span class="qty"></span>`;
-      chk.querySelector(".name").textContent = it.n;
-      chk.querySelector(".qty").textContent = it.q;
-      chk.addEventListener("click", ()=>toggle(it.id));
-      const del = document.createElement("button");
-      del.type = "button"; del.className = "del"; del.textContent = "×";
-      del.setAttribute("aria-label", "Treu " + it.n);
-      del.addEventListener("click", ()=>{
-        if (del.classList.contains("armed")) { removeItem(it); return; }
-        del.classList.add("armed"); del.textContent = "Treu";
-        setTimeout(()=>{ if (del.isConnected){ del.classList.remove("armed"); del.textContent = "×"; } }, 3000);
-      });
-      li.append(chk, del); ul.appendChild(li);
+      shopRows[aisleOf(it)].push([it, LOOK[si].c, SHORT[s.k]]);
+      if (hideDone && on) continue;
+      ul.appendChild(makeRow(it)); shown++;
     }
-    document.getElementById("c"+si).textContent = `${cs}/${items.length}`;
+    if (!items.length) ul.appendChild(emptyRow("Res a comprar aquí."));
+    else if (!shown) ul.appendChild(emptyRow("Tot comprat ✓"));
+    const ce = document.getElementById("c"+si);
+    ce.textContent = `${cs}/${items.length}`;
+    ce.classList.toggle("full", items.length > 0 && cs === items.length);
     total += items.length; n += cs;
   });
-  document.getElementById("count").textContent = `${n} / ${total}`;
+  renderShop(shopRows);
+  document.getElementById("lists").hidden = view !== "meal";
+  document.getElementById("shop").hidden = view !== "shop";
+  document.getElementById("vMeal").setAttribute("aria-pressed", view==="meal");
+  document.getElementById("vShop").setAttribute("aria-pressed", view==="shop");
+  document.getElementById("hide").setAttribute("aria-pressed", hideDone);
+  document.getElementById("count").textContent = `${n} de ${total} comprats`;
   const p = total ? Math.round(100*n/total) : 0;
   document.getElementById("pct").textContent = p + "%";
   document.getElementById("fill").style.width = p + "%";
-  document.getElementById("restore").hidden = !Object.keys(state.removed||{}).length;
+  const complete = total > 0 && n === total;
+  if (complete && wasComplete === false) confetti();
+  wasComplete = complete;
+  document.getElementById("restore").hidden = !Object.keys(state.removed||{}).length && !Object.keys(state.mealsRemoved||{}).length;
+  renderMeals();
+}
+
+/* Suma quantitats iguals ("2 pans" + "2 pans" = "4 pans"); si no es poden sumar, les ajunta */
+function sumQty(qs){
+  const parsed = qs.map(q=>{ const m = String(q).trim().match(/^(\d+(?:,\d+)?)\s*(.*)$/); return m ? [parseFloat(m[1].replace(",",".")), m[2]] : null; });
+  if (parsed.every(p=>p) && parsed.every(p=>p[1]===parsed[0][1])){
+    const t = parsed.reduce((a,p)=>a+p[0],0);
+    return (Number.isInteger(t) ? String(t) : String(t).replace(".",",")) + (parsed[0][1] ? " " + parsed[0][1] : "");
+  }
+  return qs.filter(Boolean).join(" + ");
+}
+const AICON = SV('<path d="M3 6h2l2.5 10h10L20 9H7"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/>');
+function renderShop(rows){
+  const root = document.getElementById("shop");
+  root.replaceChildren();
+  const groups = AISLES.map(([k,t])=>[k,t]).concat([["altres","Altres (afegits)"]]);
+  for (const [k,t] of groups){
+    const list = rows[k]; if (!list.length) continue;
+    const sec = document.createElement("section"); sec.className = "aisle";
+    const h = document.createElement("h2");
+    const tag = document.createElement("span"); tag.className = "tag";
+    tag.innerHTML = `<span class="ico">${AICON}</span><span></span>`; tag.lastChild.textContent = t;
+    /* Ajunta els productes repetits en una sola línia */
+    const merged = [], byName = {};
+    for (const [it,col,chip] of list){
+      const key = it.n.toLowerCase().trim();
+      if (byName[key]) byName[key].push([it,col,chip]);
+      else { byName[key] = [[it,col,chip]]; merged.push(byName[key]); }
+    }
+    const done = merged.filter(g=>g.every(([it])=>state.checks[it.id])).length;
+    const c = document.createElement("span"); c.className = "cnt"; c.style.setProperty("--c","var(--fg)");
+    c.textContent = `${done}/${merged.length}`; c.classList.toggle("full", done===merged.length);
+    h.append(tag, c); sec.appendChild(h);
+    const ul = document.createElement("ul"); ul.className = "list"; ul.style.borderRadius = "18px";
+    let shown = 0;
+    for (const g of merged){
+      const allOn = g.every(([it])=>state.checks[it.id]);
+      if (hideDone && allOn) continue;
+      if (g.length === 1){ const [it,col,chip] = g[0]; ul.appendChild(makeRow(it, col, chip)); }
+      else {
+        const items = g.map(x=>x[0]);
+        const shown1 = {n: items[0].n, q: sumQty(items.map(i=>i.q)), id: items[0].id};
+        ul.appendChild(makeRow(shown1, null, g.map(([,col,chip])=>[chip,col]), items));
+      }
+      shown++;
+    }
+    if (!shown) ul.appendChild(emptyRow("Tot comprat ✓"));
+    sec.appendChild(ul); root.appendChild(sec);
+  }
+  const p = document.createElement("p"); p.className = "foot";
+  p.textContent = "Per afegir productes, ves a Per àpat.";
+  root.appendChild(p);
 }
 
 /* ---------- Dades ---------- */
@@ -222,7 +487,7 @@ function loadLocal(){
 }
 function norm(d){
   d = d && typeof d === "object" ? d : {};
-  return {checks:d.checks||{}, items:d.items||{}, removed:d.removed||{}};
+  return {checks:d.checks||{}, items:d.items||{}, removed:d.removed||{}, meals:d.meals||{}, mealsRemoved:d.mealsRemoved||{}};
 }
 
 async function req(path, opts){
@@ -234,15 +499,22 @@ async function req(path, opts){
 const put = (p,v)=>req(p,{method:"PUT", body:JSON.stringify(v)});
 const del = p=>req(p,{method:"DELETE"});
 
+let wasComplete = null;
+function toggleMany(ids, on){
+  for (const id of ids){ if (on) state.checks[id] = true; else delete state.checks[id]; }
+  render(); saveLocal();
+  for (const id of ids) on ? put("checks/"+id, true) : del("checks/"+id);
+}
 function toggle(id){
   const on = !state.checks[id];
   if (on) state.checks[id] = true; else delete state.checks[id];
   render(); saveLocal();
+  if (on){ const li = [...document.querySelectorAll(`#${view==="meal"?"lists":"shop"} .list li`)].find(l=>l.dataset.id===id); if (li) li.classList.add("pop"); }
   on ? put("checks/"+id, true) : del("checks/"+id);
 }
 function addItem(si, n, q){
   const id = "x" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-  const v = {s:si, n, q, t:Date.now()};
+  const v = {s:SECTIONS[si].k, n, q, t:Date.now()};
   state.items[id] = v; render(); saveLocal();
   put("items/"+id, v);
 }
@@ -309,7 +581,38 @@ function updateWa(){
   const msg = "Llista de la compra: marqueu el que compreu i ho veurem tots\n" + shareUrl();
   document.getElementById("wa").href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
-function status(m){ document.getElementById("status").textContent = m; }
+function status(m){
+  const el = document.getElementById("status");
+  el.textContent = m;
+  el.classList.toggle("live", m.startsWith("Connectada"));
+}
+
+/* Confeti quan està tot comprat */
+function confetti(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = document.getElementById("fx"), ctx = cv.getContext("2d");
+  const dpr = devicePixelRatio || 1;
+  cv.width = innerWidth*dpr; cv.height = innerHeight*dpr; ctx.scale(dpr,dpr);
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ["--tomato","--basil","--sun","--plum"].map(v=>cs.getPropertyValue(v).trim());
+  const P = Array.from({length:140},()=>({
+    x:innerWidth/2+(Math.random()-.5)*120, y:innerHeight*.35,
+    vx:(Math.random()-.5)*12, vy:-Math.random()*11-4,
+    r:Math.random()*Math.PI, vr:(Math.random()-.5)*.3,
+    w:6+Math.random()*6, h:4+Math.random()*4, c:cols[Math.floor(Math.random()*cols.length)]
+  }));
+  let t = 0;
+  (function frame(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for (const p of P){
+      p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle = p.c;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    }
+    if (++t < 170) requestAnimationFrame(frame); else ctx.clearRect(0,0,innerWidth,innerHeight);
+  })();
+  status("Tot comprat! Bona festa.");
+}
 async function copy(text, okMsg){
   try{ await navigator.clipboard.writeText(text); status(okMsg); }
   catch(e){
@@ -330,8 +633,77 @@ resetok.addEventListener("click", ()=>{
   del("checks"); status("Llista desmarcada per a tothom.");
 });
 document.getElementById("restore").addEventListener("click", ()=>{
-  state.removed = {}; render(); saveLocal(); del("removed"); status("Productes recuperats.");
+  state.removed = {}; state.mealsRemoved = {}; render(); saveLocal(); del("removed"); del("mealsRemoved"); status("Productes recuperats.");
 });
+
+
+/* ---------- Àpats (editables i compartits) ---------- */
+const MEALS = [
+  ["dj","Dijous","Nit","Sopa de verdures i gyozas","var(--basil)"],
+  ["dvm","Divendres","Migdia","","var(--sun)"],
+  ["dvn","Divendres","Nit","Pa amb tomàquet, truites fetes a casa (patata, moniato i una de vegana), embotits i formatges","var(--sun)"],
+  ["dsm","Dissabte","Migdia","Restaurant","var(--plum)"],
+  ["dsn","Dissabte","Nit","Pizzes","var(--tomato)"]
+];
+function mealList(){
+  const m = state.meals || {}, rm = state.mealsRemoved || {};
+  const base = MEALS.filter(x=>!rm[x[0]]).map(([id,d,h,w,c])=>({id,d,h,w:(m[id]&&typeof m[id].w==="string")?m[id].w:w,c}));
+  const extra = Object.entries(m).filter(([id,v])=>v && v.d && !MEALS.some(x=>x[0]===id))
+    .sort((a,b)=>(a[1].t||0)-(b[1].t||0))
+    .map(([id,v])=>({id,d:String(v.d),h:"",w:String(v.w||""),c:"var(--muted)",custom:true}));
+  return base.concat(extra);
+}
+function renderMeals(){
+  const root = document.getElementById("mealrows");
+  const active = document.activeElement;
+  if (active && active.dataset && active.dataset.meal && root.contains(active)) return; /* no trepitjar qui escriu */
+  root.replaceChildren();
+  for (const ml of mealList()){
+    const row = document.createElement("div"); row.className = "meal"; row.style.setProperty("--mc", ml.c);
+    const day = document.createElement("span"); day.className = "day"; day.textContent = ml.d;
+    if (ml.h){ const sm = document.createElement("small"); sm.textContent = ml.h; day.appendChild(sm); }
+    const what = document.createElement("span"); what.className = "what";
+    const inp = document.createElement("textarea"); inp.rows = 1; inp.value = ml.w; inp.placeholder = "Per decidir";
+    inp.dataset.meal = ml.id; inp.setAttribute("aria-label", "Àpat de " + ml.d + " " + ml.h); inp.maxLength = 120;
+    const commit = ()=>{
+      const w = inp.value.trim(); if (w === ml.w) return;
+      state.meals = state.meals || {};
+      if (ml.custom){ state.meals[ml.id] = {...state.meals[ml.id], w}; put("meals/"+ml.id+"/w", w); }
+      else { state.meals[ml.id] = {w}; put("meals/"+ml.id, {w}); }
+      saveLocal(); status("Àpat desat.");
+    };
+    const fit = ()=>{ inp.style.height = "auto"; inp.style.height = inp.scrollHeight + "px"; };
+    inp.addEventListener("input", fit);
+    inp.addEventListener("keydown", e=>{ if (e.key==="Enter"){ e.preventDefault(); inp.blur(); } });
+    requestAnimationFrame(fit);
+    inp.addEventListener("blur", ()=>{ commit(); setTimeout(renderMeals,0); });
+    const x = document.createElement("button"); x.type = "button"; x.className = "del"; x.textContent = "×";
+    x.setAttribute("aria-label", "Treu l'àpat de " + ml.d);
+    x.addEventListener("click", ()=>{
+      if (!x.classList.contains("armed")){ x.classList.add("armed"); x.textContent = "Treu";
+        setTimeout(()=>{ if (x.isConnected){ x.classList.remove("armed"); x.textContent = "×"; } },3000); return; }
+      if (ml.custom){ delete state.meals[ml.id]; del("meals/"+ml.id); }
+      else { state.mealsRemoved = state.mealsRemoved || {}; state.mealsRemoved[ml.id] = true; put("mealsRemoved/"+ml.id, true); }
+      saveLocal(); render();
+    });
+    what.append(inp, x); row.append(day, what); root.appendChild(row);
+  }
+}
+document.getElementById("madd").addEventListener("submit", e=>{
+  e.preventDefault();
+  const d = document.getElementById("md").value.trim(), w = document.getElementById("mw").value.trim();
+  if (!d) { document.getElementById("md").focus(); return; }
+  const id = "m" + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  const v = {d, w, t:Date.now()};
+  state.meals = state.meals || {}; state.meals[id] = v; put("meals/"+id, v);
+  e.target.reset(); saveLocal(); render();
+});
+
+document.getElementById("vMeal").addEventListener("click", ()=>{ view="meal"; try{localStorage.setItem("lc-view",view)}catch(e){} render(); });
+document.getElementById("vShop").addEventListener("click", ()=>{ view="shop"; try{localStorage.setItem("lc-view",view)}catch(e){} render(); });
+document.getElementById("hide").addEventListener("click", ()=>{ hideDone=!hideDone; try{localStorage.setItem("lc-hide",hideDone?"1":"0")}catch(e){} render(); });
+try{ if (localStorage.getItem("lc-tip")!=="0") document.getElementById("tip").hidden = false; }catch(e){ document.getElementById("tip").hidden = false; }
+document.getElementById("tipx").addEventListener("click", ()=>{ document.getElementById("tip").hidden = true; try{localStorage.setItem("lc-tip","0")}catch(e){} });
 
 build(); loadLocal(); render(); updateWa(); status("Connectant…"); connect();
 </script>
