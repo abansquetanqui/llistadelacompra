@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Llista de la compra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#f3f6f1; --card:#ffffff; --fg:#1d2a22; --muted:#66756b; --line:#dbe3dc;
+  --accent:#3f7a3a; --accent-soft:#e3efe0; --done:#9aa79e; --wa:#1f8f4e; --warn:#b3412e;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#141a16; --card:#1c241f; --fg:#e6ede7; --muted:#9aa89e; --line:#2c3830;
+  --accent:#8cc985; --accent-soft:#25362a; --done:#5d6b62; --wa:#5fd08f; --warn:#f08a74; color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(20px + env(safe-area-inset-top,0px)) calc(48px + env(safe-area-inset-bottom,0px))}
+h1{font-family:var(--display);font-weight:800;font-size:2rem;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding-block:12px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.prog{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
+.prog b{font-family:var(--display);font-size:1.15rem}
+.track{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--accent);transition:width .25s}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.act{font:inherit;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none;display:inline-block}
+.act.primary{background:var(--wa);color:var(--bg);border-color:var(--wa)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{font-size:.85rem;color:var(--muted);min-height:1.2em}
+section{margin-top:24px}
+h2{font-family:var(--display);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between}
+h2 span{font-variant-numeric:tabular-nums}
+.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:14px 14px 0 0;overflow:hidden}
+.list li{display:flex;align-items:center}
+.list li+li{border-top:1px solid var(--line)}
+.check{all:unset;box-sizing:border-box;flex:1;min-width:0;display:flex;gap:12px;align-items:center;padding:12px 4px 12px 14px;cursor:pointer;min-height:48px}
+.check:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;transition:background .15s,border-color .15s}
+.box svg{width:14px;height:14px;opacity:0;color:var(--bg)}
+.name{flex:1;min-width:0;overflow-wrap:anywhere}
+.qty{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums;text-align:right}
+.list li.done .box{background:var(--accent);border-color:var(--accent)}
+.list li.done .box svg{opacity:1}
+.list li.done .name{color:var(--done);text-decoration:line-through}
+.del{flex:none;font:inherit;border:0;background:none;color:var(--muted);cursor:pointer;min-width:44px;min-height:44px;padding:0 10px;font-size:1.1rem;line-height:1;border-radius:8px}
+.del.armed{color:var(--bg);background:var(--warn);font-size:.8rem;font-weight:700;margin-right:6px;min-height:32px}
+.add{display:flex;gap:6px;padding:8px;background:var(--card);border:1px solid var(--line);border-top:1px dashed var(--line);border-radius:0 0 14px 14px}
+.add input{font:inherit;font-size:.95rem;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);color:var(--fg)}
+.add .n{flex:2}
+.add .q{flex:1}
+.add button{font:inherit;font-weight:700;font-size:.9rem;border:0;border-radius:8px;padding:0 12px;background:var(--accent);color:var(--bg);cursor:pointer}
+.empty{padding:12px 14px;color:var(--muted);font-size:.9rem}
+details{margin-top:28px;background:var(--accent-soft);border-radius:14px;padding:12px 14px}
+summary{font-family:var(--display);font-weight:600;cursor:pointer}
+.pz{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.pz li{font-size:.95rem}
+.pz b{display:block}
+.reset{margin-top:24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Llista de la compra</h1>
+  <p class="sub">Toca un producte per marcar-lo. Pots afegir-ne o treure'n. Tothom qui tingui l'enllaç veu el mateix al moment.</p>
+
+  <div class="bar">
+    <div class="prog"><b id="count">0 / 0</b><span id="pct" class="sub" style="margin:0">0%</span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="actions">
+      <a class="act primary" id="wa" href="#" target="_blank" rel="noopener">Envia per WhatsApp</a>
+      <button class="act" id="copylink" type="button">Copia l'enllaç</button>
+      <button class="act" id="pending" type="button">Copia el que falta</button>
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </div>
+
+  <div id="lists"></div>
+
+  <details>
+    <summary>Les 5 pizzes</summary>
+    <ul class="pz">
+      <li><b>1. Hortolana</b>Tomàquet, mozzarella vegana, ceba, pebrot, xampinyons, olives negres, orenga</li>
+      <li><b>2. Mallorquina</b>Tomàquet, mozzarella vegana, sobrassada vegana, agave en sortir del forn</li>
+      <li><b>3. Bianca de carxofa</b>Crema de soja blanca, all, julivert fresc, carxofes, formatge ratllat vegà, burger Heura, olives negres, xampinyons</li>
+      <li><b>4. BBQ</b>Tomàquet, mozzarella vegana, carn picada vegana, parmesà vegà, salsa BBQ vegana, ceba, orenga</li>
+      <li><b>5. Tòfona</b>Tomàquet, mozzarella vegana, butifarra Heura (o pernil dolç vegà), xampinyons, tòfona triturada en oli d'oliva i rúcula en sortir del forn</li>
+    </ul>
+  </details>
+
+  <div class="reset">
+    <button class="act" id="reset" type="button">Desmarca-ho tot</button>
+    <button class="act" id="resetok" type="button" hidden>Sí, desmarca-ho</button>
+    <button class="act" id="restore" type="button">Recupera els productes trets</button>
+  </div>
+</div>
+
+<script>
+/* Llista inicial: [id curt, nom, quantitat]. El que la gent afegeixi o tregui es guarda a Firebase. */
+const SECTIONS = [
+  {t:"Esmorzars", items:[
+    ["pa","Pa de poble","1"],["formatges","Formatges",""],["embotit","Embotit del poble",""],
+    ["figa","Melmelada de figa","1 pot"],["civada","Llet de civada","1 brik"],["cafe","Cafè","1 paquet"]]},
+  {t:"Plats", items:[
+    ["caldo","Caldo","1 brik"],["pastasopa","Pasta de sopa","1 paquet"],["gyozas","Gyozas","1 paquet"],
+    ["tfregit","Tomàquet fregit","1 pot"],["carbasso","Carbassó","1"],["heuracl","Heura clàssica","1 paquet"]]},
+  {t:"Pizzes", items:[
+    ["massa","Massa de pizza","5 boles"],["ttriturat","Tomàquet triturat","1 pot"],
+    ["mozza","Mozzarella vegana","2 paquets"],["ceba","Ceba","1"],["pebrot","Pebrot","1"],
+    ["xampis","Xampinyons","1 safata"],["olives","Olives negres","1 pot"],["orenga","Orenga","1 pot"],
+    ["sobrassada","Sobrassada vegana","1 paquet"],["agave","Agave","1 pot"],
+    ["cremasoja","Crema de soja","1 brik"],["all","All","1 cap"],["julivert","Julivert","1 manat"],
+    ["carxofes","Carxofes","1 pot"],["ratllat","Formatge ratllat vegà","1 paquet"],
+    ["burgers","Burgers Heura","1 paquet"],["picada","Carn picada vegana","1 paquet"],
+    ["parmesa","Parmesà vegà","1 paquet"],["bbq","Salsa BBQ vegana","1 ampolla"],
+    ["butifarra","Butifarra Heura (o pernil dolç vegà)","1 paquet"],
+    ["tofona","Tòfona triturada en oli d'oliva","1 pot"],["rucula","Rúcula","1 bossa"]]},
+  {t:"Begudes", items:[
+    ["vinegre","Vi negre",""],["viblanc","Vi blanc",""],["birra","Birra",""],
+    ["coca","Coca-Cola Zero",""],["clares","Clares",""]]}
+];
+
+/* Firebase Realtime Database: /llista/checks, /llista/items (afegits), /llista/removed (trets) */
+const DB = "https://llista-de-la-compra-b11bf-default-rtdb.europe-west1.firebasedatabase.app/llista";
+const LS = "llista-compra-v2";
+let state = {checks:{}, items:{}, removed:{}};
+
+const tick = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+
+/* Productes visibles d'una secció: els de base que no s'han tret + els afegits */
+function itemsOf(si){
+  const s = SECTIONS[si];
+  const base = s.items.filter(i=>!state.removed[i[0]]).map(([id,n,q])=>({id,n,q}));
+  const extra = Object.entries(state.items||{})
+    .filter(([,v])=>v && v.s===si && v.n)
+    .sort((a,b)=>(a[1].t||0)-(b[1].t||0))
+    .map(([id,v])=>({id, n:String(v.n), q:String(v.q||""), custom:true}));
+  return base.concat(extra);
+}
+
+/* ---------- Interfície ---------- */
+const lists = [];
+function build(){
+  const root = document.getElementById("lists");
+  SECTIONS.forEach((s,si)=>{
+    const sec = document.createElement("section");
+    const h = document.createElement("h2");
+    const b = document.createElement("b"); b.textContent = s.t;
+    const c = document.createElement("span"); c.id = "c"+si;
+    h.append(b,c);
+    const ul = document.createElement("ul"); ul.className = "list";
+    const f = document.createElement("form"); f.className = "add";
+    f.innerHTML = `<input class="n" id="n${si}" placeholder="Afegeix a ${s.t.toLowerCase()}…" aria-label="Producte nou" maxlength="60" autocomplete="off">
+      <input class="q" id="q${si}" placeholder="Quantitat" aria-label="Quantitat" maxlength="20" autocomplete="off">
+      <button type="submit">+</button>`;
+    f.addEventListener("submit", e=>{
+      e.preventDefault();
+      const n = f.querySelector(".n").value.trim();
+      const q = f.querySelector(".q").value.trim();
+      if (!n) return;
+      addItem(si, n, q);
+      f.reset(); f.querySelector(".n").focus();
+    });
+    sec.append(h, ul, f); root.appendChild(sec);
+    lists.push(ul);
+  });
+}
+
+function render(){
+  let total = 0, n = 0;
+  SECTIONS.forEach((s,si)=>{
+    const ul = lists[si];
+    const items = itemsOf(si);
+    ul.replaceChildren();
+    if (!items.length){
+      const li = document.createElement("li"); li.className = "empty"; li.textContent = "Res a comprar aquí.";
+      ul.appendChild(li);
+    }
+    let cs = 0;
+    for (const it of items){
+      const on = !!state.checks[it.id];
+      if (on) cs++;
+      const li = document.createElement("li");
+      if (on) li.className = "done";
+      const chk = document.createElement("button");
+      chk.type = "button"; chk.className = "check";
+      chk.setAttribute("aria-pressed", on ? "true":"false");
+      chk.innerHTML = `<span class="box">${tick}</span><span class="name"></span><span class="qty"></span>`;
+      chk.querySelector(".name").textContent = it.n;
+      chk.querySelector(".qty").textContent = it.q;
+      chk.addEventListener("click", ()=>toggle(it.id));
+      const del = document.createElement("button");
+      del.type = "button"; del.className = "del"; del.textContent = "×";
+      del.setAttribute("aria-label", "Treu " + it.n);
+      del.addEventListener("click", ()=>{
+        if (del.classList.contains("armed")) { removeItem(it); return; }
+        del.classList.add("armed"); del.textContent = "Treu";
+        setTimeout(()=>{ if (del.isConnected){ del.classList.remove("armed"); del.textContent = "×"; } }, 3000);
+      });
+      li.append(chk, del); ul.appendChild(li);
+    }
+    document.getElementById("c"+si).textContent = `${cs}/${items.length}`;
+    total += items.length; n += cs;
+  });
+  document.getElementById("count").textContent = `${n} / ${total}`;
+  const p = total ? Math.round(100*n/total) : 0;
+  document.getElementById("pct").textContent = p + "%";
+  document.getElementById("fill").style.width = p + "%";
+  document.getElementById("restore").hidden = !Object.keys(state.removed||{}).length;
+}
+
+/* ---------- Dades ---------- */
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+function loadLocal(){
+  try{ const d = JSON.parse(localStorage.getItem(LS)||"null"); if (d) state = norm(d); }catch(e){}
+}
+function norm(d){
+  d = d && typeof d === "object" ? d : {};
+  return {checks:d.checks||{}, items:d.items||{}, removed:d.removed||{}};
+}
+
+async function req(path, opts){
+  try{
+    const r = await fetch(`${DB}/${path}.json`, opts);
+    if (!r.ok) throw new Error(r.status);
+  }catch(e){ status("No s'ha pogut guardar per a tothom. Comprova la connexió."); }
+}
+const put = (p,v)=>req(p,{method:"PUT", body:JSON.stringify(v)});
+const del = p=>req(p,{method:"DELETE"});
+
+function toggle(id){
+  const on = !state.checks[id];
+  if (on) state.checks[id] = true; else delete state.checks[id];
+  render(); saveLocal();
+  on ? put("checks/"+id, true) : del("checks/"+id);
+}
+function addItem(si, n, q){
+  const id = "x" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  const v = {s:si, n, q, t:Date.now()};
+  state.items[id] = v; render(); saveLocal();
+  put("items/"+id, v);
+}
+function removeItem(it){
+  delete state.checks[it.id];
+  if (it.custom){ delete state.items[it.id]; del("items/"+it.id); }
+  else { state.removed[it.id] = true; put("removed/"+it.id, true); }
+  del("checks/"+it.id);
+  render(); saveLocal();
+}
+
+/* Aplica un canvi rebut en directe (path relatiu a /llista) */
+function apply(path, data, patch){
+  const keys = path.split("/").filter(Boolean);
+  if (!keys.length){
+    if (patch){ for (const [k,v] of Object.entries(data||{})) setAt([k], v); }
+    else state = norm(data);
+  } else if (patch){
+    for (const [k,v] of Object.entries(data||{})) setAt(keys.concat(k.split("/")), v);
+  } else setAt(keys, data);
+  state = norm(state);
+  render(); saveLocal();
+}
+function setAt(keys, val){
+  let o = state;
+  for (let i=0;i<keys.length-1;i++){
+    if (typeof o[keys[i]] !== "object" || o[keys[i]] === null) o[keys[i]] = {};
+    o = o[keys[i]];
+  }
+  const last = keys[keys.length-1];
+  if (val === null) delete o[last]; else o[last] = val;
+}
+
+let online = false;
+function connect(){
+  if (!("EventSource" in window)) return poll();
+  const es = new EventSource(`${DB}.json`);
+  const on = patch => ev => {
+    try{ const m = JSON.parse(ev.data); apply(m.path, m.data, patch); }catch(e){}
+    if (!online){ online = true; status("Connectada: tothom veu el mateix."); }
+  };
+  es.addEventListener("put", on(false));
+  es.addEventListener("patch", on(true));
+  es.onerror = ()=>{ if (online){ online = false; status("S'ha perdut la connexió. Tornant a connectar…"); } };
+}
+async function poll(){
+  try{ const r = await fetch(`${DB}.json`); apply("/", await r.json(), false); status("Connectada: tothom veu el mateix."); }
+  catch(e){ status("Sense connexió."); }
+  setTimeout(poll, 5000);
+}
+
+/* ---------- Compartir ---------- */
+function shareUrl(){ return location.href.split("#")[0]; }
+function pendingText(){
+  let out = "*Falta comprar*\n";
+  SECTIONS.forEach((s,si)=>{
+    const items = itemsOf(si).filter(i=>!state.checks[i.id]);
+    if (!items.length) return;
+    out += `\n*${s.t}*\n` + items.map(i=>"- " + i.n + (i.q?` (${i.q})`:"")).join("\n") + "\n";
+  });
+  return out.trim();
+}
+function updateWa(){
+  const msg = "Llista de la compra: marqueu el que compreu i ho veurem tots\n" + shareUrl();
+  document.getElementById("wa").href = "https://wa.me/?text=" + encodeURIComponent(msg);
+}
+function status(m){ document.getElementById("status").textContent = m; }
+async function copy(text, okMsg){
+  try{ await navigator.clipboard.writeText(text); status(okMsg); }
+  catch(e){
+    const ta = document.createElement("textarea"); ta.value = text;
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try{ ok = document.execCommand("copy"); }catch(_){}
+    ta.remove(); status(ok ? okMsg : "No s'ha pogut copiar.");
+  }
+}
+document.getElementById("copylink").addEventListener("click", ()=>copy(shareUrl(), "Enllaç copiat."));
+document.getElementById("pending").addEventListener("click", ()=>copy(pendingText(), "Copiat. Enganxa-ho al xat."));
+
+const reset = document.getElementById("reset"), resetok = document.getElementById("resetok");
+reset.addEventListener("click", ()=>{ resetok.hidden = !resetok.hidden; });
+resetok.addEventListener("click", ()=>{
+  state.checks = {}; resetok.hidden = true; render(); saveLocal();
+  del("checks"); status("Llista desmarcada per a tothom.");
+});
+document.getElementById("restore").addEventListener("click", ()=>{
+  state.removed = {}; render(); saveLocal(); del("removed"); status("Productes recuperats.");
+});
+
+build(); loadLocal(); render(); updateWa(); status("Connectant…"); connect();
+</script>
+</body>
+</html>
